@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Form</title>
+    </head>
+    <body>
+        <h1>Spring Boot</h1>
+        <h3>Enter your name</h3>
+        <form th:action="@{/parameter}" th:object="${user}" method="post">
+            <input type="text" th:field="*{name}" placeholder="Enter your name" required/>
+            <button type="submit">Submit</button>
+        </form>
+        <button onclick="location.href='/home'">back</button>
+    </body>
+</html>
