@@ -2,14 +2,51 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <title>Form</title>
+        <link rel="stylesheet" th:href="@{/css/style.css}">
     </head>
     <body>
         <h1>Spring Boot</h1>
-        <h3>Enter your name</h3>
-        <form th:action="@{/parameter}" th:object="${user}" method="post">
-            <input type="text" th:field="*{name}" placeholder="Enter your name" required/>
-            <button type="submit">Submit</button>
+        <h3 th:text="${name == 'user'}?'Enter your name':'Enter search query'"/>
+        <form th:action="${name == 'user'}?@{/parameter}:@{/instagram}" th:object="${user}" method="post">
+            <input type="text" th:field="*{name}"/>
+            <button type="submit" onclick="this.form.submit(); this.disabled=true;">Submit</button>
         </form>
         <button onclick="location.href='/home'">back</button>
+        <div th:if="${query_result != null and #lists.size(query_result) > 0}">
+            <table>
+                <thead th:style="'background-color:rgb(50,50,150); color:rgb(255,255,255)'">
+                <tr>
+                    <th>URL</th>
+                    <th>description</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="query_row : ${query_result}">
+                        <td th:style="'background-color:' + 'rgb('
+                + (1 * 200 + (1 - 1) * 255) + ','
+                + (1 * 200 + (1 - 1) * 255) + ','
+                + (1 * 100 + (1 - 1) * 255) + ');'">
+                            <a th:href="'https://www.instagram.com/p/'+${query_row.key}+'/'" th:text="'https://www.instagram.com/p/'+${query_row.key}+'/'"></a>
+                        </td>
+                        <td th:style="'background-color:' + 'rgb('
+                + (1 * 200 + (1 - 1) * 255) + ','
+                + (1 * 200 + (1 - 1) * 255) + ','
+                + (1 * 100 + (1 - 1) * 255) + ');'"
+                            onclick="this.querySelector('form').submit(); this.onclick=null;" style="cursor:pointer;">
+                            <form th:action="@{/instagram}" th:object="${user}" method="post">
+                                <input type="hidden" name="name" th:attr="value = ${query_row.value}"/>
+                                <span th:text="${query_row.value}"></span>
+                            </form>
+                        </td>
+                        <td>
+                            <div class="bar-container">
+                                <div class="bar-fill"
+                                     th:style="'width:' + (${query_row.color} * 100) + '%;'"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </body>
 </html>

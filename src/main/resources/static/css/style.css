@@ -2,12 +2,13 @@
     width: 150px;
     height: 12px;
     background-color: #e5e7eb;
-    border-radius: 6px;
+    border: 1px solid black;
+    border-radius: 4px;    /* slight rounding */
     overflow: hidden;
 }
 
 .bar-fill {
     height: 100%;
     background-color: #3b82f6;
-    border-radius: 6px;
+    border-radius: 2px;
 }

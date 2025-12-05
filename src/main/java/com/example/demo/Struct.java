@@ -1,7 +1,8 @@
 package com.example.demo;
 
-public class Pair<K, V> {
+public class Struct<K, V, C> {
     public K key;
     public V value;
-    public Pair(K key, V value) { this.key = key; this.value = value; }
+    public C color;
+    public Struct(K key, V value, C color) { this.key = key; this.value = value; this.color = color; }
 }
