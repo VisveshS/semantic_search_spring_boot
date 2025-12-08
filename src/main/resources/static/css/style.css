@@ -12,3 +12,27 @@
     background-color: #3b82f6;
     border-radius: 2px;
 }
+
+.same_cluster { background-color: rgb(200,200,250); }
+.different_cluster { background-color: rgb(200,200,100); }
+
+/* Button style */
+.submit-button {
+  background-color: #4CAF50;   /* nice green */
+  color: white;                /* white text */
+  border: none;                /* remove default border */
+  padding: 12px 20px;          /* space inside button */
+  text-align: center;          /* center text */
+  text-decoration: none;       /* no underline */
+  display: block;              /* makes it full-width if parent has width */
+  width: 100%;                 /* match table/container width */
+  font-size: 16px;             /* readable text size */
+  border-radius: 8px;          /* rounded corners */
+  cursor: pointer;             /* pointer on hover */
+  transition: background-color 0.3s ease; /* smooth hover effect */
+}
+
+/* Hover effect */
+.submit-button:hover {
+  background-color: #45a049;   /* slightly darker green */
+}

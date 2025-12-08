@@ -5,10 +5,11 @@
         <link rel="stylesheet" th:href="@{/css/style.css}">
     </head>
     <body>
-        <h1>Spring Boot</h1>
+        <h1>Spring Boot - Semantic Search</h1>
         <h3 th:text="${name == 'user'}?'Enter your name':'Enter search query'"/>
         <form th:action="${name == 'user'}?@{/parameter}:@{/instagram}" th:object="${user}" method="post">
             <input type="text" th:field="*{name}"/>
+            <input type="hidden" name="form_state" value="1"/>
             <button type="submit" onclick="this.form.submit(); this.disabled=true;">Submit</button>
         </form>
         <button onclick="location.href='/home'">back</button>
@@ -22,31 +23,32 @@
                 </thead>
                 <tbody>
                     <tr th:each="query_row : ${query_result}">
-                        <td th:style="'background-color:' + 'rgb('
-                + (1 * 200 + (1 - 1) * 255) + ','
-                + (1 * 200 + (1 - 1) * 255) + ','
-                + (1 * 100 + (1 - 1) * 255) + ');'">
-                            <a th:href="'https://www.instagram.com/p/'+${query_row.key}+'/'" th:text="'https://www.instagram.com/p/'+${query_row.key}+'/'"></a>
+                        <td th:class="${query_row.reciprocal and !formdetails.from_inputbar} ? 'same_cluster' : 'different_cluster'">
+                            <a th:href="${query_row.key}" th:text="${query_row.key}"></a>
                         </td>
-                        <td th:style="'background-color:' + 'rgb('
-                + (1 * 200 + (1 - 1) * 255) + ','
-                + (1 * 200 + (1 - 1) * 255) + ','
-                + (1 * 100 + (1 - 1) * 255) + ');'"
+                        <td th:class="${query_row.reciprocal and !formdetails.from_inputbar} ? 'same_cluster' : 'different_cluster'"
                             onclick="this.querySelector('form').submit(); this.onclick=null;" style="cursor:pointer;">
                             <form th:action="@{/instagram}" th:object="${user}" method="post">
                                 <input type="hidden" name="name" th:attr="value = ${query_row.value}"/>
+                                <input type="hidden" name="form_state" value="2"/>
                                 <span th:text="${query_row.value}"></span>
                             </form>
                         </td>
                         <td>
                             <div class="bar-container">
                                 <div class="bar-fill"
-                                     th:style="'width:' + (${query_row.color} * 100) + '%;'"></div>
+                                     th:style="'width:' + (${query_row.score} * 100) + '%;'">
+                                </div>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            <form th:if="${formdetails.showmore}" th:action="@{/instagram}" method="post">
+                <!-- Hidden field bound to DTO -->
+                <input type="hidden" name="form_state" value="3"/>
+                <button type="submit" class="submit-button" style="width: 100%;" onclick="this.form.submit(); this.disabled=true;">Show More</button>
+            </form>
         </div>
     </body>
 </html>
