@@ -5,50 +5,135 @@
         <link rel="stylesheet" th:href="@{/css/style.css}">
     </head>
     <body>
-        <h1>Spring Boot - Semantic Search</h1>
-        <h3 th:text="${name == 'user'}?'Enter your name':'Enter search query'"/>
-        <form th:action="${name == 'user'}?@{/parameter}:@{/instagram}" th:object="${user}" method="post">
-            <input type="text" th:field="*{name}"/>
-            <input type="hidden" name="form_state" value="1"/>
+        <h1>Spring Boot, Python - Semantic Search</h1>
+        <div class="header-row">
+            <h3>Enter search query</h3>
+            <button id="openExitPopup">Exit</button>
+        </div>
+        <div id="exitform" class="exitpopup">
+            <div class="exitpopup-content">
+                <form action="/index" method="post">
+                    <input type="hidden" name="args" value="">
+                    <input type="hidden" name="useraction" value="5">
+                    <button id="SaveAndExit">SAVE</button>
+                </form>
+                <form action="/index" method="post">
+                    <input type="hidden" name="args" value="">
+                    <input type="hidden" name="useraction" value="6">
+                    <button id="NoSaveAndExit">DON'T SAVE</button>
+                </form>
+                <button id="closeExitPopup">BACK</button>
+            </div>
+        </div>
+        <form th:action="@{/index}" method="post">
+            <input type="text" name="args" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[2]}"/>
+            <input type="hidden" name="useraction" value="1"/>
             <button type="submit" onclick="this.form.submit(); this.disabled=true;">Submit</button>
         </form>
-        <button onclick="location.href='/home'">back</button>
         <div th:if="${query_result != null and #lists.size(query_result) > 0}">
             <table>
                 <thead th:style="'background-color:rgb(50,50,150); color:rgb(255,255,255)'">
                 <tr>
                     <th>URL</th>
                     <th>description</th>
+                    <th>in_knn size</th>
+                </tr>
+                <tr th:if="${query_result[0].values[0] != ''}">
+                    <td>
+                        <a class="custom-link" th:href="${query_result[0].values[1]}" th:text="${query_result[0].values[1]}"></a>
+                    </td>
+                    <td>
+                        <p>[[${query_result[0].values[2]}]]</p>
+                    </td>
+                    <td>
+                        <p>[[${query_result[0].values[3]}]]</p>
+                    </td>
                 </tr>
                 </thead>
+<!--                output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float triangle_mesh_fraction, cansave) [details of_node]-->
+<!--                output[1:] = (int id, string url, string description, int in_knn_length, float pagerank, mutual knn)-->
                 <tbody>
-                    <tr th:each="query_row : ${query_result}">
-                        <td th:class="${query_row.reciprocal and !formdetails.from_inputbar} ? 'same_cluster' : 'different_cluster'">
-                            <a th:href="${query_row.key}" th:text="${query_row.key}"></a>
+                    <tr th:each="query_row, iterStat : ${query_result}" th:if="${!iterStat.first}">
+                        <td th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'">
+                            <a th:href="${query_row.values[1]}" th:text="${query_row.values[1]}"></a>
                         </td>
-                        <td th:class="${query_row.reciprocal and !formdetails.from_inputbar} ? 'same_cluster' : 'different_cluster'"
+                        <td th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'"
                             onclick="this.querySelector('form').submit(); this.onclick=null;" style="cursor:pointer;">
-                            <form th:action="@{/instagram}" th:object="${user}" method="post">
-                                <input type="hidden" name="name" th:attr="value = ${query_row.value}"/>
-                                <input type="hidden" name="form_state" value="2"/>
-                                <span th:text="${query_row.value}"></span>
+                            <form th:action="@{/index}" method="post">
+                                <input type="hidden" name="args" th:attr="value = ${query_row.values[0]}"/>
+                                <input type="hidden" name="useraction" value="0"/>
+                                <span th:text="${query_row.values[2]}"></span>
                             </form>
                         </td>
                         <td>
-                            <div class="bar-container">
-                                <div class="bar-fill"
-                                     th:style="'width:' + (${query_row.score} * 100) + '%;'">
-                                </div>
-                            </div>
+                            <p th:text="${query_row.values[3]}"></p>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <form th:if="${formdetails.showmore}" th:action="@{/instagram}" method="post">
-                <!-- Hidden field bound to DTO -->
-                <input type="hidden" name="form_state" value="3"/>
-                <button type="submit" class="submit-button" style="width: 100%;" onclick="this.form.submit(); this.disabled=true;">Show More</button>
+        </div>
+        <div style="display:flex; width:100%; margin-top:10px;">
+            <button th:if="${!#lists.isEmpty(query_result) and query_result[0].values[0] == ''}" onclick="openPopup()" style="flex:1;">Insert</button>
+            <!-- Popup -->
+            <div id="popup" style="display:none; position:fixed; top:30%; left:30%; background:#fff; border:1px solid #ccc; padding:20px; z-index:1000;">
+                <form th:action="@{/index}" method="post" onsubmit="appendStr(event)">
+                    <!-- Input field -->
+                    <input type="text" id="args" name="args" placeholder="enter URL"/>
+
+                    <!-- Hidden field with Thymeleaf value -->
+                    <input type="hidden" id="desc" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[2]}" />
+                    <input type="hidden" name="useraction" value="2"/>
+                    <!-- Buttons -->
+                    <button type="submit">Submit</button>
+                    <button type="button" onclick="closePopup()">Cancel</button>
+                </form>
+            </div>
+            <form th:if="${!#lists.isEmpty(query_result) and query_result[0].values[0] != ''}" th:action="@{/index}" method="post" style="flex:1;">
+                <input type="hidden" name="args" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[0]}"/>
+                <input type="hidden" name="useraction" value="3"/>
+                <button type="submit" style="width:100%;">Delete</button>
+            </form>
+            <form th:if="${!#lists.isEmpty(query_result)}" th:action="@{/index}" method="post" style="flex:1;">
+                <input type="hidden" name="args" value=""/>
+                <input type="hidden" name="useraction" value="4"/>
+                <button type="submit" style="width:100%;">Save</button>
             </form>
         </div>
     </body>
+    <script>
+        function openPopup() {
+          document.getElementById("popup").style.display = "block";
+        }
+        function closePopup() {
+          document.getElementById("popup").style.display = "none";
+        }
+        function appendStr(event) {
+          const input = document.getElementById("args");
+          const desc = document.getElementById("desc").value;
+
+          // Concatenate and assign back to args
+          input.value = input.value + ' ' + desc;
+
+          // Submit form with updated args
+          form.submit();
+        }
+        const exitpopup = document.getElementById("exitform");
+        const openexitBtn = document.getElementById("openExitPopup");
+        const closeexitBtn = document.getElementById("closeExitPopup");
+
+        openexitBtn.onclick = () => exitpopup.style.display = "block";
+        closeexitBtn.onclick = () => exitpopup.style.display = "none";
+
+        // POST request buttons
+        document.getElementById("SaveAndExit").onclick = () => {
+          fetch("/index", { method: "POST" })
+            .then(res => alert("saved to db and closed connection"))
+            .catch(err => console.error(err));
+        };
+        document.getElementById("exited successfully").onclick = () => {
+          fetch("/index", { method: "POST" })
+            .then(res => alert("POST 2 sent"))
+            .catch(err => console.error(err));
+        };
+    </script>
 </html>
