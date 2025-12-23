@@ -37,6 +37,7 @@
                     <th>URL</th>
                     <th>description</th>
                     <th>in_knn size</th>
+                    <th>norm. pagerank</th>
                 </tr>
                 <tr th:if="${query_result[0].values[0] != ''}">
                     <td>
@@ -47,6 +48,9 @@
                     </td>
                     <td>
                         <p>[[${query_result[0].values[3]}]]</p>
+                    </td>
+                    <td>
+                        <p>[[${query_result[0].values[4]}]]</p>
                     </td>
                 </tr>
                 </thead>
@@ -67,6 +71,9 @@
                         </td>
                         <td>
                             <p th:text="${query_row.values[3]}"></p>
+                        </td>
+                        <td>
+                            <p th:text="${query_row.values[4]}"></p>
                         </td>
                     </tr>
                 </tbody>

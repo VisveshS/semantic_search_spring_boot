@@ -56,6 +56,7 @@ public class Semantic_search {
         String line;
         String dburl;
         String dbdesc;
+        String pagerank;
         int nline=-1;
         if(action == 0) {
             writer.println("querynode");
@@ -64,11 +65,11 @@ public class Semantic_search {
             try {
                 dburl = reader.readLine();
                 dbdesc = reader.readLine();
-                Integer nodeid = Integer.parseInt(args);
                 String nodeid_in_knn_count = reader.readLine();
+                pagerank = reader.readLine();
                 String mutual_knn = reader.readLine();
                 String cansave = reader.readLine();
-                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count,"","",cansave))));
+                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count, pagerank,"",cansave))));
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
                 for(int i=0;i<nline;i++) {
@@ -77,7 +78,7 @@ public class Semantic_search {
                     line = reader.readLine();
                     String[] tokens = line.split(" ");
                     Integer nid = Integer.parseInt(tokens[0]);
-                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc, tokens[1],"",String.valueOf(mutual_knn.charAt(i))))));
+                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc, tokens[1],tokens[2],String.valueOf(mutual_knn.charAt(i))))));
                 }
             }
             catch (IOException e) {
@@ -100,7 +101,7 @@ public class Semantic_search {
                     line = reader.readLine();
                     String[] tokens = line.split(" ");
                     Integer nid = Integer.parseInt(tokens[0]);
-                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc,tokens[1],"",""))));
+                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc,tokens[1],tokens[2],""))));
                 }
             }
             catch (IOException e) {
@@ -115,12 +116,11 @@ public class Semantic_search {
             line = reader.readLine();
             Integer new_index = Integer.parseInt(line);
             String nodeid_in_knn_count = reader.readLine();
+            pagerank = reader.readLine();
             String mutual_knn = reader.readLine();
             String cansave = reader.readLine();
             String insertfield[] = args.split(" ",2);
-//    output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float triangle_mesh_fraction, cansave) [details of_node]
-//    output[1:] = (int id, string url, string description, int in_knn_length, float pagerank, mutual knn)
-            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,"","",cansave))));
+            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,pagerank,"",cansave))));
             for(int i=1;i<queryoutput.size();i++) {
                 queryoutput.get(i).fetchSlice().set(5,String.valueOf(mutual_knn.charAt(i-1)));
             }
