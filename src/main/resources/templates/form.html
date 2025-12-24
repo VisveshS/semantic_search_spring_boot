@@ -8,27 +8,27 @@
         <h1>Spring Boot, Python - Semantic Search</h1>
         <div class="header-row">
             <h3>Enter search query</h3>
-            <button id="openExitPopup">Exit</button>
+            <button id="openExitPopup" class="btn btn-exit">⏻</button>
         </div>
         <div id="exitform" class="exitpopup">
-            <div class="exitpopup-content">
+            <div class="exitpopup-content button-row">
                 <form action="/index" method="post">
                     <input type="hidden" name="args" value="">
                     <input type="hidden" name="useraction" value="5">
-                    <button id="SaveAndExit">SAVE</button>
+                    <button id="SaveAndExit" class="btn btn-save">SAVE</button>
                 </form>
                 <form action="/index" method="post">
                     <input type="hidden" name="args" value="">
                     <input type="hidden" name="useraction" value="6">
-                    <button id="NoSaveAndExit">DON'T SAVE</button>
+                    <button id="NoSaveAndExit" class="btn btn-nosave">DON'T SAVE</button>
                 </form>
-                <button id="closeExitPopup">BACK</button>
+                <button id="closeExitPopup" class="btn btn-cancel">ⓧ</button>
             </div>
         </div>
         <form th:action="@{/index}" method="post">
             <input type="text" name="args" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[2]}"/>
             <input type="hidden" name="useraction" value="1"/>
-            <button type="submit" onclick="this.form.submit(); this.disabled=true;">Submit</button>
+            <button type="submit" onclick="this.form.submit(); this.disabled=true;" class = "btn btn-insert">Submit</button>
         </form>
         <div th:if="${query_result != null and #lists.size(query_result) > 0}">
             <table>
@@ -80,10 +80,11 @@
             </table>
         </div>
         <div style="display:flex; width:100%; margin-top:10px;">
-            <button th:if="${!#lists.isEmpty(query_result) and query_result[0].values[0] == ''}" onclick="openPopup()" style="flex:1;">Insert</button>
+            <button th:if="${!#lists.isEmpty(query_result) and query_result[0].values[0] == ''}" onclick="openPopup()" style="flex:1;" class="btn btn-insert">Insert</button>
             <!-- Popup -->
-            <div id="popup" style="display:none; position:fixed; top:30%; left:30%; background:#fff; border:1px solid #ccc; padding:20px; z-index:1000;">
-                <form th:action="@{/index}" method="post" onsubmit="appendStr(event)">
+            <div id="popup" style="display:none; position:fixed; top:30%; left:30%; background:#fff; border:1px solid #ccc; padding:20px; padding-right:10px; z-index:1000;">
+                <p th:text="${#lists.isEmpty(query_result) ? '' : query_result[0].values[2]}" style="font-style: italic;"></p>
+                <form th:action="@{/index}" method="post" onsubmit="appendStr(event)" class="button-row">
                     <!-- Input field -->
                     <input type="text" id="args" name="args" placeholder="enter URL"/>
 
@@ -91,19 +92,19 @@
                     <input type="hidden" id="desc" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[2]}" />
                     <input type="hidden" name="useraction" value="2"/>
                     <!-- Buttons -->
-                    <button type="submit">Submit</button>
-                    <button type="button" onclick="closePopup()">Cancel</button>
+                    <button type="submit" class="btn btn-save">Submit</button>
+                    <button type="button" onclick="closePopup()" class="btn btn-cancel">ⓧ</button>
                 </form>
             </div>
             <form th:if="${!#lists.isEmpty(query_result) and query_result[0].values[0] != ''}" th:action="@{/index}" method="post" style="flex:1;">
                 <input type="hidden" name="args" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[0]}"/>
                 <input type="hidden" name="useraction" value="3"/>
-                <button type="submit" style="width:100%;">Delete</button>
+                <button type="submit" style="width:100%;" class="btn btn-delete">Delete</button>
             </form>
             <form th:if="${!#lists.isEmpty(query_result)}" th:action="@{/index}" method="post" style="flex:1;">
                 <input type="hidden" name="args" value=""/>
                 <input type="hidden" name="useraction" value="4"/>
-                <button type="submit" style="width:100%;">Save</button>
+                <button type="submit" style="width:100%;" class="btn btn-save">Save</button>
             </form>
         </div>
     </body>
