@@ -49,7 +49,7 @@ public class Semantic_search {
     }
 
     //if qurey string size = 0 then setup embeddings , if = 1 then run
-//    output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float triangle_mesh_fraction, cansave) [details of_node]
+//    output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float clustering score, cansave) [details of_node]
 //    output[1:] = (int id, string url, string description, int in_knn_length, float pagerank, mutual knn)
     public ArrayList<QueryResultSlice> query(Integer action, String args) throws IOException, InterruptedException {
         while (!constructed) {wait();}
@@ -61,15 +61,19 @@ public class Semantic_search {
         if(action == 0) {
             writer.println("querynode");
             writer.println(args);
-            queryoutput.clear();
             try {
+                line = reader.readLine();
+                if(line.compareTo("0") == 0)
+                    return queryoutput;
                 dburl = reader.readLine();
                 dbdesc = reader.readLine();
                 String nodeid_in_knn_count = reader.readLine();
                 pagerank = reader.readLine();
                 String mutual_knn = reader.readLine();
+                String clustering = reader.readLine();
                 String cansave = reader.readLine();
-                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count, pagerank,"",cansave))));
+                queryoutput.clear();
+                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count, pagerank, clustering, cansave))));
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
                 for(int i=0;i<nline;i++) {
@@ -91,10 +95,11 @@ public class Semantic_search {
             writer.println(args);
             queryoutput.clear();
             try {
+                String cscore = reader.readLine();
                 String cansave = reader.readLine();
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
-                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("", "", args,"","","",cansave))));
+                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("", "", args,"","", cscore, cansave))));
                 for(int i=0;i<nline;i++) {
                     dburl = reader.readLine();
                     dbdesc = reader.readLine();
@@ -118,9 +123,10 @@ public class Semantic_search {
             String nodeid_in_knn_count = reader.readLine();
             pagerank = reader.readLine();
             String mutual_knn = reader.readLine();
+            String cscore = reader.readLine();
             String cansave = reader.readLine();
             String insertfield[] = args.split(" ",2);
-            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,pagerank,"",cansave))));
+            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,pagerank,cscore,cansave))));
             for(int i=1;i<queryoutput.size();i++) {
                 queryoutput.get(i).fetchSlice().set(5,String.valueOf(mutual_knn.charAt(i-1)));
             }
@@ -131,7 +137,9 @@ public class Semantic_search {
         else if (action == 3) {
             writer.println("delete");
             writer.println(args);
+            String clustering = reader.readLine();
             line = reader.readLine();
+            queryoutput.get(0).fetchSlice().set(5,clustering);
             queryoutput.get(0).fetchSlice().set(0,"");
             for(int i=1;i<queryoutput.size();i++) {
                 queryoutput.get(i).fetchSlice().set(5,"0");

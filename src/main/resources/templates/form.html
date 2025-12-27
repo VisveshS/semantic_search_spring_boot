@@ -31,6 +31,9 @@
             <button type="submit" onclick="this.form.submit(); this.disabled=true;" class = "btn btn-insert">Submit</button>
         </form>
         <div th:if="${query_result != null and #lists.size(query_result) > 0}">
+            <div style="text-align: center; font-size: 24px; font-family: 'Roboto', sans-serif;">
+                <i>clustering score: <span th:text="${query_result[0].values[5]}"></span></i>
+            </div>
             <table>
                 <thead th:style="'background-color:rgb(50,50,150); color:rgb(255,255,255)'">
                 <tr>
