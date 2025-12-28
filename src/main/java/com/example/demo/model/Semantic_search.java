@@ -96,6 +96,7 @@ public class Semantic_search {
             queryoutput.clear();
             try {
                 String cscore = reader.readLine();
+                String mutual_knn = reader.readLine();
                 String cansave = reader.readLine();
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
@@ -106,7 +107,7 @@ public class Semantic_search {
                     line = reader.readLine();
                     String[] tokens = line.split(" ");
                     Integer nid = Integer.parseInt(tokens[0]);
-                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc,tokens[1],tokens[2],""))));
+                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc,tokens[1],tokens[2],String.valueOf(mutual_knn.charAt(i))))));
                 }
             }
             catch (IOException e) {
@@ -141,9 +142,9 @@ public class Semantic_search {
             line = reader.readLine();
             queryoutput.get(0).fetchSlice().set(5,clustering);
             queryoutput.get(0).fetchSlice().set(0,"");
-            for(int i=1;i<queryoutput.size();i++) {
-                queryoutput.get(i).fetchSlice().set(5,"0");
-            }
+//            for(int i=1;i<queryoutput.size();i++) {
+//                queryoutput.get(i).fetchSlice().set(5,"0");
+//            }
         }
         else if (action == 4) {
             writer.println("save");
