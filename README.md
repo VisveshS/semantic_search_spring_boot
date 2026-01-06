@@ -1,4 +1,6 @@
-Simple _spring boot mvc_ in java for running local semantic searches on large text documents
+Simple _spring boot mvc_ in java for providing interface for local semantic search.
+
+Semantic search code in python , and is used for searching best matches for query string from many phrases
 
 IDE: IntelliJ
 
