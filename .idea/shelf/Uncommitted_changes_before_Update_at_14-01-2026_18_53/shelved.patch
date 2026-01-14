@@ -1,0 +1,35 @@
+Index: src/main/java/com/example/demo/ViewController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.demo;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n\r\nimport org.springframework.stereotype.Controller;\r\nimport org.springframework.ui.Model;\r\nimport org.springframework.web.bind.annotation.ModelAttribute;\r\nimport org.springframework.web.bind.annotation.GetMapping;\r\nimport org.springframework.web.bind.annotation.PostMapping;\r\nimport org.springframework.web.bind.annotation.RequestParam;\r\n\r\n@Controller\r\npublic class ViewController {\r\n\r\n    private final List<User> users = new ArrayList<>();\r\n\r\n    @GetMapping(\"/home\")\r\n    public String helloView(Model model) {\r\n        model.addAttribute(\"message\", \"Hello from Spring MVC + Thymeleaf!\");\r\n        model.addAttribute(\"userlist\", users);\r\n        return \"hello\";\r\n    }\r\n\r\n    @GetMapping(\"/parameter\")\r\n    public String helloViewName(@RequestParam(name = \"name\", required = false, defaultValue = \"Guest\") String name, Model model) {\r\n        model.addAttribute(\"message\", \"Hello \" + name + \", from Spring MVC + Thymeleaf!\");\r\n        model.addAttribute(\"userlist\", users);\r\n        return \"hello\";\r\n    }\r\n\r\n    @GetMapping(\"/form\")\r\n    public String viewForm(Model model) {\r\n        model.addAttribute(\"user\", new User());\r\n        return \"form\";\r\n    }\r\n\r\n    @PostMapping(\"/parameter\")\r\n    public String handleForm(@ModelAttribute(\"user\") User user, Model model) {\r\n        users.add(user);\r\n        model.addAttribute(\"message\", \"Hello \" + user.name + \", from Spring MVC + Thymeleaf!\");\r\n        model.addAttribute(\"userlist\", users);\r\n        return \"hello\";\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/demo/ViewController.java b/src/main/java/com/example/demo/ViewController.java
+--- a/src/main/java/com/example/demo/ViewController.java	(revision 5dbd8e29bf10a0d49e0beb6e0e50ff21ff638e50)
++++ b/src/main/java/com/example/demo/ViewController.java	(date 1762459672272)
+@@ -9,7 +9,9 @@
+ import org.springframework.web.bind.annotation.GetMapping;
+ import org.springframework.web.bind.annotation.PostMapping;
+ import org.springframework.web.bind.annotation.RequestParam;
+-
++/*
++* all-MiniLM-L6-v2 instead of the other url
++* */
+ @Controller
+ public class ViewController {
+ 
+Index: src/main/java/com/example/demo/model/semantic_search.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/demo/model/semantic_search.java b/src/main/java/com/example/demo/model/semantic_search.java
+new file mode 100644
+--- /dev/null	(date 1762460291376)
++++ b/src/main/java/com/example/demo/model/semantic_search.java	(date 1762460291376)
+@@ -0,0 +1,4 @@
++package com.example.demo.model;
++
++public class semantic_search {
++}

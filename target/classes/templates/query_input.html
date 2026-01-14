@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Query input form</title>
+</head>
+<body>
+<h1>Semanitic search though spring boot</h1>
+<h3>Enter your search string</h3>
+<form th:action="@{/instagram}" th:object="${user}" method="post">
+    <input type="text" th:field="*{name}" placeholder="Enter your name" required/>
+    <button type="submit">Submit</button>
+</form>
+<button onclick="location.href='/home'">back</button>
+</body>
+</html>
