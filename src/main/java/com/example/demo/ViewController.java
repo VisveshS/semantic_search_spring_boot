@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 
 @Controller
 public class ViewController {
@@ -34,6 +36,7 @@ public class ViewController {
             System.out.println(e.getMessage());
         }
         model.addAttribute("query_result", output);
+        model.addAttribute("new_entries", semantic_search.newEntries);
         return "form";
     }
 }

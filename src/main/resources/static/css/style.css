@@ -116,6 +116,15 @@
   background-color: #757575;
 }
 
+.btn-bulkinput {
+  background-color: #4CAF50; /* green */
+  color: #fff;
+}
+
+.btn-bulkinput:hover {
+  background-color: #388E3C; /* darker green */
+}
+
 .button-row {
   display: flex;
   gap: 8px;       /* space between buttons */
@@ -128,4 +137,11 @@
   border: none;          /* removes border */
   cursor: pointer;       /* shows pointer on hover */
   color: #333;           /* text color */
+}
+
+.scroll-box {
+    max-height: 250px;      /* limit visible height */
+    overflow-y: auto;       /* vertical scroll */
+    border: 1px solid #ccc;
+    padding: 8px;
 }

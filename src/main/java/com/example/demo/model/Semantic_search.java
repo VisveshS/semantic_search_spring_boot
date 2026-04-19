@@ -19,6 +19,7 @@ public class Semantic_search {
 
     Boolean constructed = false;
     ArrayList<QueryResultSlice> queryoutput = new ArrayList<>();
+    public ArrayList<String> newEntries = new ArrayList<String>();
 
     BufferedReader reader;
     PrintWriter writer;
@@ -49,8 +50,8 @@ public class Semantic_search {
     }
 
     //if qurey string size = 0 then setup embeddings , if = 1 then run
-//    output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float clustering score, cansave) [details of_node]
-//    output[1:] = (int id, string url, string description, int in_knn_length, float pagerank, mutual knn)
+//    output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float clustering score, boolean cansave, string website, num_embeddings, url_bulk_insert) [details of_node]
+//    output[1:] = (int id, string url, string description, int in_knn_length, float pagerank, mutual knn, website)
     public ArrayList<QueryResultSlice> query(Integer action, String args) throws IOException, InterruptedException {
         while (!constructed) {wait();}
         String line;
@@ -72,8 +73,9 @@ public class Semantic_search {
                 String mutual_knn = reader.readLine();
                 String clustering = reader.readLine();
                 String cansave = reader.readLine();
+                String num_embeddings = reader.readLine();
                 queryoutput.clear();
-                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count, pagerank, clustering, cansave))));
+                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count, pagerank, clustering, cansave, QueryResultSlice.fetchSourceSite(dburl), num_embeddings))));
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
                 for(int i=0;i<nline;i++) {
@@ -81,8 +83,7 @@ public class Semantic_search {
                     dbdesc = reader.readLine();
                     line = reader.readLine();
                     String[] tokens = line.split(" ");
-                    Integer nid = Integer.parseInt(tokens[0]);
-                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc, tokens[1],tokens[2],String.valueOf(mutual_knn.charAt(i))))));
+                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc, tokens[1],tokens[2],String.valueOf(mutual_knn.charAt(i)),QueryResultSlice.fetchSourceSite(dburl)))));
                 }
             }
             catch (IOException e) {
@@ -98,16 +99,17 @@ public class Semantic_search {
                 String cscore = reader.readLine();
                 String mutual_knn = reader.readLine();
                 String cansave = reader.readLine();
+                String num_embeddings = reader.readLine();
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
-                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("", "", args,"","", cscore, cansave))));
+                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("", "", args,"","", cscore, cansave,"", num_embeddings))));
                 for(int i=0;i<nline;i++) {
                     dburl = reader.readLine();
                     dbdesc = reader.readLine();
                     line = reader.readLine();
                     String[] tokens = line.split(" ");
                     Integer nid = Integer.parseInt(tokens[0]);
-                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc,tokens[1],tokens[2],String.valueOf(mutual_knn.charAt(i))))));
+                    queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc,tokens[1],tokens[2],String.valueOf(mutual_knn.charAt(i)),QueryResultSlice.fetchSourceSite(dburl)))));
                 }
             }
             catch (IOException e) {
@@ -127,7 +129,8 @@ public class Semantic_search {
             String cscore = reader.readLine();
             String cansave = reader.readLine();
             String insertfield[] = args.split(" ",2);
-            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,pagerank,cscore,cansave))));
+            String num_embeddings = String.valueOf(Integer.parseInt(queryoutput.get(0).fetchSlice().get(8))+1);
+            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,pagerank,cscore,cansave,QueryResultSlice.fetchSourceSite(insertfield[0]), num_embeddings, num_embeddings))));
             for(int i=1;i<queryoutput.size();i++) {
                 queryoutput.get(i).fetchSlice().set(5,String.valueOf(mutual_knn.charAt(i-1)));
             }
@@ -142,6 +145,8 @@ public class Semantic_search {
             line = reader.readLine();
             queryoutput.get(0).fetchSlice().set(5,clustering);
             queryoutput.get(0).fetchSlice().set(0,"");
+            Integer num_embeddings = Integer.parseInt(queryoutput.get(0).fetchSlice().get(8));
+            queryoutput.get(0).fetchSlice().set(8,String.valueOf(num_embeddings-1));
 //            for(int i=1;i<queryoutput.size();i++) {
 //                queryoutput.get(i).fetchSlice().set(5,"0");
 //            }
@@ -157,7 +162,7 @@ public class Semantic_search {
             writer.println("exit");
             new Thread(() -> {
                 try {
-                    Thread.sleep(100); // small delay so response is flushed
+                    Thread.sleep(200); // small delay so response is flushed
                     System.exit(0);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -175,6 +180,21 @@ public class Semantic_search {
                     Thread.currentThread().interrupt();
                 }
             }).start();
+        }
+        //bulk input, no processing, convienience only
+        else if (action == 7) {
+            newEntries.clear();
+            if(args.length()>0)
+                for(String s: args.split("\n"))
+                    newEntries.add(s);
+        }
+        else if (action == 8) {
+            String[] newEntry = newEntries.get(Integer.parseInt(args)).split(" ", 2);
+            String url = newEntry[0];
+            String desc = newEntry[1];
+            newEntries.remove(Integer.parseInt(args));
+            this.query(1, desc);
+            queryoutput.get(0).fetchSlice().add(url);
         }
         return queryoutput;
     }

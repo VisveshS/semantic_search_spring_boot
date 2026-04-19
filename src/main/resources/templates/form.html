@@ -22,6 +22,10 @@
                     <input type="hidden" name="useraction" value="6">
                     <button id="NoSaveAndExit" class="btn btn-nosave">DON'T SAVE</button>
                 </form>
+                <button id="BulkInputBtn"
+                        type="button"
+                        onclick="document.getElementById('newEntries').style.display = ''; document.getElementById('exitform').style.display = 'none';"
+                        class="btn btn-bulkinput">Bulk</button>
                 <button id="closeExitPopup" class="btn btn-cancel">ⓧ</button>
             </div>
         </div>
@@ -30,6 +34,35 @@
             <input type="hidden" name="useraction" value="1"/>
             <button type="submit" onclick="this.form.submit(); this.disabled=true;" class = "btn btn-insert">Submit</button>
         </form>
+        <span id="newentryURL"
+              onclick="navigator.clipboard.writeText(this.innerText)"
+              th:text="${query_result != null and !#lists.isEmpty(query_result) and query_result[0].values.size() > 9 ? query_result[0].values[9] : ''}">
+        </span>
+
+        <form id="newEntries" th:action="@{/index}" method="post" style="display:none;">
+            <label for="content">List of new (url desc)</label><br>
+            <textarea id="content" name="args" style="width:50%; min-height:50px;"></textarea>
+            <input type="hidden" name="useraction" value="7"/>
+            <button type="submit" onclick="this.form.submit();">Submit</button>
+        </form>
+        <div th:if="${new_entries != null and #lists.size(new_entries) > 0}">
+            <form id="newentrieslist" th:action="@{/index}" method="post">
+                <input type="hidden" name="args" id="newentrieslistargs"/>
+                <div class="scroll-box">
+                    <ul>
+                        <li th:each="item, stat : ${new_entries}">
+                            <input type="hidden" name="useraction" value="8"/>
+                            <span
+                                    th:data-firstword="${item != null ? #strings.arraySplit(item,' ')[0] : ''}"
+                                    th:text="${item}"
+                                    th:onclick="|document.getElementById('newentrieslistargs').value=${stat.index};
+                                    document.getElementById('newentrieslist').submit();|">
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
         <div th:if="${query_result != null and #lists.size(query_result) > 0}">
             <div style="text-align: center; font-size: 24px; font-family: 'Roboto', sans-serif;">
                 <i>clustering score: <span th:text="${query_result[0].values[5]}"></span></i>
@@ -44,7 +77,7 @@
                 </tr>
                 <tr th:if="${query_result[0].values[0] != ''}">
                     <td>
-                        <a class="custom-link" th:href="${query_result[0].values[1]}" th:text="${query_result[0].values[1]}"></a>
+                        <a class="custom-link" th:href="${query_result[0].values[1]}" th:text="${query_result[0].values[7]}"></a>
                     </td>
                     <td>
                         <p>[[${query_result[0].values[2]}]]</p>
@@ -62,7 +95,7 @@
                 <tbody>
                     <tr th:each="query_row, iterStat : ${query_result}" th:if="${!iterStat.first}">
                         <td th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'">
-                            <a th:href="${query_row.values[1]}" th:text="${query_row.values[1]}"></a>
+                            <a th:href="${query_row.values[1]}" th:text="${query_row.values[6]}"></a>
                         </td>
                         <td th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'"
                             onclick="this.querySelector('form').submit(); this.onclick=null;" style="cursor:pointer;">
@@ -110,41 +143,43 @@
                 <button type="submit" style="width:100%;" class="btn btn-save">Save</button>
             </form>
         </div>
+        <div style="text-align:right;" th:text="'Number of embeddings: ' + (${#lists.isEmpty(query_result) ? '' : query_result[0].values[8]})"></div>
+        <script>
+            function openPopup() {
+              document.getElementById("popup").style.display = "block";
+              document.getElementById("args").value = document.getElementById("newentryURL").innerText;
+            }
+            function closePopup() {
+              document.getElementById("popup").style.display = "none";
+            }
+            function appendStr(event) {
+              const input = document.getElementById("args");
+              const desc = document.getElementById("desc").value;
+
+              // Concatenate and assign back to args
+              input.value = input.value + ' ' + desc;
+
+              // Submit form with updated args
+              form.submit();
+            }
+            const exitpopup = document.getElementById("exitform");
+            const openexitBtn = document.getElementById("openExitPopup");
+            const closeexitBtn = document.getElementById("closeExitPopup");
+
+            openexitBtn.onclick = () => exitpopup.style.display = "block";
+            closeexitBtn.onclick = () => exitpopup.style.display = "none";
+
+            // POST request buttons
+            document.getElementById("SaveAndExit").onclick = () => {
+              fetch("/index", { method: "POST" })
+                .then(res => alert("saved to db and closed connection"))
+                .catch(err => console.error(err));
+            };
+            document.getElementById("exited successfully").onclick = () => {
+              fetch("/index", { method: "POST" })
+                .then(res => alert("POST 2 sent"))
+                .catch(err => console.error(err));
+            };
+        </script>
     </body>
-    <script>
-        function openPopup() {
-          document.getElementById("popup").style.display = "block";
-        }
-        function closePopup() {
-          document.getElementById("popup").style.display = "none";
-        }
-        function appendStr(event) {
-          const input = document.getElementById("args");
-          const desc = document.getElementById("desc").value;
-
-          // Concatenate and assign back to args
-          input.value = input.value + ' ' + desc;
-
-          // Submit form with updated args
-          form.submit();
-        }
-        const exitpopup = document.getElementById("exitform");
-        const openexitBtn = document.getElementById("openExitPopup");
-        const closeexitBtn = document.getElementById("closeExitPopup");
-
-        openexitBtn.onclick = () => exitpopup.style.display = "block";
-        closeexitBtn.onclick = () => exitpopup.style.display = "none";
-
-        // POST request buttons
-        document.getElementById("SaveAndExit").onclick = () => {
-          fetch("/index", { method: "POST" })
-            .then(res => alert("saved to db and closed connection"))
-            .catch(err => console.error(err));
-        };
-        document.getElementById("exited successfully").onclick = () => {
-          fetch("/index", { method: "POST" })
-            .then(res => alert("POST 2 sent"))
-            .catch(err => console.error(err));
-        };
-    </script>
 </html>
