@@ -10,6 +10,23 @@
             <h3>Enter search query</h3>
             <button id="openExitPopup" class="btn btn-exit">⏻</button>
         </div>
+        <div class="dropdown-container">
+            <button type="button" class="btn btn-insert" id="submitBtn">Clusters ▼</button>
+            <div class="dropdown-content">
+                <form id="sliderForm" th:action="@{/index}" method="post">
+                    <div class="slider-group">
+                        <label>X: <span id="xVal">2</span></label>
+                        <input type="range" name="numhops" id="xSlider" min="1" max="5" value="2">
+                    </div>
+                    <div class="slider-group">
+                        <label>Y: <span id="yVal">30</span></label>
+                        <input type="range" name="numneighs" id="ySlider" min="3" max="40" value="30">
+                    </div>
+                    <input type="hidden" name="args" id="argsInput"/>
+                    <input type="hidden" name="useraction" value="9"/>
+                </form>
+            </div>
+        </div>
         <div id="exitform" class="exitpopup">
             <div class="exitpopup-content button-row">
                 <form action="/index" method="post">
@@ -36,7 +53,9 @@
         </form>
         <span id="newentryURL"
               onclick="navigator.clipboard.writeText(this.innerText)"
-              th:text="${query_result != null and !#lists.isEmpty(query_result) and query_result[0].values.size() > 9 ? query_result[0].values[9] : ''}">
+              <a th:href="${query_result != null and !#lists.isEmpty(query_result) and query_result[0].values.size() > 9 ? query_result[0].values[9] : ''}"
+                  th:text="${query_result != null and !#lists.isEmpty(query_result) and query_result[0].values.size() > 9 ? query_result[0].values[9] : ''}">
+              </a>
         </span>
 
         <form id="newEntries" th:action="@{/index}" method="post" style="display:none;">
@@ -74,8 +93,11 @@
                     <th>description</th>
                     <th>in_knn size</th>
                     <th>norm. pagerank</th>
+                    <th th:if="${query_result[0].values[0] == '-1'}">
+                        cluster size
+                    </th>
                 </tr>
-                <tr th:if="${query_result[0].values[0] != ''}">
+                <tr th:if="${query_result[0].values[0] != '' && query_result[0].values[0] != '-1'}">
                     <td>
                         <a class="custom-link" th:href="${query_result[0].values[1]}" th:text="${query_result[0].values[7]}"></a>
                     </td>
@@ -90,8 +112,8 @@
                     </td>
                 </tr>
                 </thead>
-<!--                output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float triangle_mesh_fraction, cansave) [details of_node]-->
-<!--                output[1:] = (int id, string url, string description, int in_knn_length, float pagerank, mutual knn)-->
+<!--                output[0] = (int id, string url, string description, int in_knn_length, float pagerank, float triangle_mesh_fraction, cansave, batch insert url) [details of_node]-->
+<!--                output[1:] = (int id, string url, string description, int in_knn_length, float pagerank, mutual knn, cluster size)-->
                 <tbody>
                     <tr th:each="query_row, iterStat : ${query_result}" th:if="${!iterStat.first}">
                         <td th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'">
@@ -111,10 +133,22 @@
                         <td>
                             <p th:text="${query_row.values[4]}"></p>
                         </td>
+                        <td th:if="${query_result[0].values[0] == '-1'}"
+                            th:text="${query_row.values[7]}">
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        <table class="custom-table">
+            <tbody>
+            <tr th:each="slice : ${privatenodetags}">
+                <td th:each="val : ${slice.values}"
+                    th:text="${val}">
+                </td>
+            </tr>
+            </tbody>
+        </table>
         <div style="display:flex; width:100%; margin-top:10px;">
             <button th:if="${!#lists.isEmpty(query_result) and query_result[0].values[0] == ''}" onclick="openPopup()" style="flex:1;" class="btn btn-insert">Insert</button>
             <!-- Popup -->
@@ -175,11 +209,40 @@
                 .then(res => alert("saved to db and closed connection"))
                 .catch(err => console.error(err));
             };
-            document.getElementById("exited successfully").onclick = () => {
+            document.getElementById("NoSaveAndExit").onclick = () => {
               fetch("/index", { method: "POST" })
                 .then(res => alert("POST 2 sent"))
                 .catch(err => console.error(err));
             };
+            document.addEventListener("DOMContentLoaded", function() {
+                const xSlider = document.getElementById("xSlider");
+                const ySlider = document.getElementById("ySlider");
+                const xVal = document.getElementById("xVal");
+                const yVal = document.getElementById("yVal");
+                const submitBtn = document.getElementById("submitBtn");
+                const form = document.getElementById("sliderForm");
+                const argsInput = document.getElementById("argsInput");
+                console.log(xSlider);
+
+                // Initialize values
+                xVal.textContent = xSlider.value;
+                yVal.textContent = ySlider.value;
+
+                // Update values
+                xSlider.addEventListener("input", function() {
+                    xVal.textContent = xSlider.value;
+                });
+
+                ySlider.addEventListener("input", function() {
+                    yVal.textContent = ySlider.value;
+                });
+
+                // Submit
+                submitBtn.addEventListener("click", function() {
+                    argsInput.value = xSlider.value + " " + ySlider.value;
+                    form.submit();
+                });
+            });
         </script>
     </body>
 </html>
