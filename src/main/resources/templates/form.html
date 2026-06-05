@@ -52,7 +52,7 @@
             <button type="submit" onclick="this.form.submit(); this.disabled=true;" class = "btn btn-insert">Submit</button>
         </form>
         <span id="newentryURL"
-              onclick="navigator.clipboard.writeText(this.innerText)"
+              onclick="navigator.clipboard.writeText(this.innerText)">
               <a th:href="${query_result != null and !#lists.isEmpty(query_result) and query_result[0].values.size() > 9 ? query_result[0].values[9] : ''}"
                   th:text="${query_result != null and !#lists.isEmpty(query_result) and query_result[0].values.size() > 9 ? query_result[0].values[9] : ''}">
               </a>
