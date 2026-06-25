@@ -6,6 +6,7 @@
     </head>
     <body>
         <h1>Spring Boot, Python - Semantic Search</h1>
+        <button id="publicnodes" onclick="scrollToId('privatenodes')" class="btn btn-seek">Bottom</button>
         <div class="header-row">
             <h3>Enter search query</h3>
             <button id="openExitPopup" class="btn btn-exit">⏻</button>
@@ -20,7 +21,7 @@
                     </div>
                     <div class="slider-group">
                         <label>Y: <span id="yVal">30</span></label>
-                        <input type="range" name="numneighs" id="ySlider" min="3" max="40" value="30">
+                        <input type="range" name="numneighs" id="ySlider" min="3" max="40" value="15">
                     </div>
                     <input type="hidden" name="args" id="argsInput"/>
                     <input type="hidden" name="useraction" value="9"/>
@@ -51,6 +52,7 @@
             <input type="hidden" name="useraction" value="1"/>
             <button type="submit" onclick="this.form.submit(); this.disabled=true;" class = "btn btn-insert">Submit</button>
         </form>
+
         <span id="newentryURL"
               onclick="navigator.clipboard.writeText(this.innerText)">
               <a th:href="${query_result != null and !#lists.isEmpty(query_result) and query_result[0].values.size() > 9 ? query_result[0].values[9] : ''}"
@@ -97,7 +99,7 @@
                         cluster size
                     </th>
                 </tr>
-                <tr th:if="${query_result[0].values[0] != '' && query_result[0].values[0] != '-1'}">
+                <tr th:if="${query_result[0].values[0] != '' && query_result[0].values[0] != '-1'}" onclick="toggleRow('rephrasedropdown')">
                     <td>
                         <a class="custom-link" th:href="${query_result[0].values[1]}" th:text="${query_result[0].values[7]}"></a>
                     </td>
@@ -109,6 +111,32 @@
                     </td>
                     <td>
                         <p>[[${query_result[0].values[4]}]]</p>
+                    </td>
+                </tr>
+                <!-- Hidden expandable row -->
+                <tr id="rephrasedropdown" style="display:none;">
+                    <td colspan="2">
+                        <form th:action="@{/index}" method="post">
+                            <div class="rephrase-container">
+                                <input type="text" id="rephraseargs" th:name="args"/>
+                                <input type="hidden" id="rephraseaction" name="useraction" value="10"/>
+                                <input type="hidden" id="rephrasefield" name="updatedfield" value="0"/>
+                                <div class="button-group">
+                                    <button type="submit"
+                                            onclick="submitrephrase('rephrasedropdown', '0')">
+                                        new url
+                                    </button>
+                                    <button type="submit"
+                                            onclick="submitrephrase('rephrasedropdown', '1')">
+                                        visible text
+                                    </button>
+                                    <button type="submit"
+                                            onclick="submitrephrase('rephrasedropdown', '2')">
+                                        true embedding
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </td>
                 </tr>
                 </thead>
@@ -140,7 +168,8 @@
                 </tbody>
             </table>
         </div>
-        <table class="custom-table">
+        <button id="privatenodes" onclick="scrollToId('publicnodes')" class="btn btn-seek">Top</button>
+        <table class="darktable">
             <tbody>
             <tr th:each="slice : ${privatenodetags}">
                 <td th:each="val : ${slice.values}"
@@ -243,6 +272,32 @@
                     form.submit();
                 });
             });
+            function toggleRow(row) {
+                const details = document.getElementById(row);
+                if(details.style.display==='none')
+                    document.getElementById("rephraseargs").value = "";
+                details.style.display = details.style.display === 'none' ? '' : 'none';
+            }
+            function submitrephrase(row, prefixFlag) {
+                const a = document.getElementById("rephraseargs").value;
+                document.getElementById("rephrasefield").value = prefixFlag;
+                const details = document.getElementById(row);
+                details.style.display = details.style.display === 'none' ? '' : 'none';
+                toggleRow('rephrasedropdown', prefixFlag);
+                console.log("is url/desc?", (prefixFlag=='0'||prefixFlag=='1'));
+                if(prefixFlag=='0'||prefixFlag=='1') {
+                    document.getElementById("rephraseargs").value = prefixFlag + " " + a;
+                    document.getElementById("rephraseaction").value = 11;
+                }
+                else if(prefixFlag=='2') {
+                    document.getElementById("rephraseargs").value = a;
+                    document.getElementById("rephraseaction").value = 10;
+                }
+            }
+            function scrollToId(id) {
+                document.getElementById(id)
+                        .scrollIntoView({ behavior: "smooth" });
+            }
         </script>
     </body>
 </html>

@@ -20,7 +20,7 @@ public class ViewController {
         model.addAttribute("formstate", new FormState());
         ArrayList<QueryResultSlice> output = null;
         try {
-            output = semantic_search.query(9, "3 10");
+            output = semantic_search.query(9, "2 15");
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

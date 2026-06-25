@@ -236,6 +236,19 @@ public class Semantic_search {
                 queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(tokens[0], dburl, dbdesc,tokens[1],tokens[2],"0",QueryResultSlice.fetchSourceSite(dburl), tokens[3]))));
             }
         }
+        else if (action == 10) {
+            writer.println("rephrase");
+            writer.println(queryoutput.get(0).fetchSlice().get(0) + " " + args);
+            line = reader.readLine();
+            query(0, line);
+        }
+        else if (action == 11) {
+            writer.println("update");
+            writer.println(queryoutput.get(0).fetchSlice().get(0));
+            writer.println(args);
+            line = reader.readLine();
+            query(0, line);
+        }
         return queryoutput;
     }
     public ArrayList<QueryResultSlice> GetPrivateNotesTags() {

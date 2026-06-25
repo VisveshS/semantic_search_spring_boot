@@ -125,6 +125,15 @@
   background-color: #388E3C; /* darker green */
 }
 
+.btn-seek {
+  background-color: #d98ca3;
+  color: #5a1f2f;
+}
+
+.btn-seek:hover {
+  background-color: #c76f8b;
+  color: #4a1725;
+}
 .button-row {
   display: flex;
   gap: 8px;       /* space between buttons */
@@ -163,7 +172,57 @@
     pointer-events: auto;
 }
 
-/* KEY PART */
 .dropdown-container:hover .dropdown-content {
     display: block;
+}
+
+table.darktable {
+    border-collapse: collapse;
+    border: 2px solid black;
+    background-color: #333;
+    color: white;
+}
+
+table.darktable th {
+    background-color: #444;
+    color: white;
+    border: 1px solid black;
+    padding: 8px;
+}
+
+table.darktable td {
+    padding: 8px;
+}
+
+table.darktable tr:nth-child(even) {
+    background-color: #383838;
+}
+
+table.darktable tr:nth-child(odd) {
+    background-color: #333333;
+}
+
+.button-group {
+    display: flex;
+    gap: 0;
+    width: 100%;
+}
+
+.button-group button {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid black;
+    background-color: #d98ca3;
+    color: #5a1f2f;
+    cursor: pointer;
+    border-radius: 0;
+}
+
+.button-group button:not(:first-child) {
+    border-left: none;
+}
+
+.button-group button:hover {
+    background-color: #c76f8b;
+    color: #4a1725;
 }
