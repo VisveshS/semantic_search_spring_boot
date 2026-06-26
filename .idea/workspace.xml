@@ -6,12 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="8bb1e708-6eba-4728-be99-29c2396f26b1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/demo/ViewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/demo/ViewController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/demo/model/Semantic_search.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/demo/model/Semantic_search.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/example/demo/model/Semantic_search.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/demo/model/Semantic_search.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/css/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,14 +141,39 @@
       <option name="project" value="LOCAL" />
       <updated>1780662522078</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="rephrase &amp; update">
+      <option name="closed" value="true" />
+      <created>1782345915378</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1782345915378</updated>
+    </task>
+    <task id="LOCAL-00007" summary="rephrase &amp; update">
+      <option name="closed" value="true" />
+      <created>1782346060453</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1782346060453</updated>
+    </task>
+    <task id="LOCAL-00008" summary="rephrase &amp; update">
+      <option name="closed" value="true" />
+      <created>1782346135135</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1782346135135</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="old version save" />
     <MESSAGE value="new clustering" />
     <MESSAGE value="clustering feature added" />
-    <option name="LAST_COMMIT_MESSAGE" value="clustering feature added" />
+    <MESSAGE value="rephrase &amp; update" />
+    <option name="LAST_COMMIT_MESSAGE" value="rephrase &amp; update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
