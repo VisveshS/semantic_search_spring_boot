@@ -195,13 +195,23 @@ table.darktable td {
 }
 
 table.darktable tr:nth-child(even) {
-    background-color: #383838;
+    background-color: #484848;
 }
 
 table.darktable tr:nth-child(odd) {
     background-color: #333333;
 }
 
+table.darktable tr.highlight {
+    white-space: pre-wrap;
+    background-color: #E2E2E2;
+    color: #222;
+}
+
+table.darktable tr.highlight td {
+    white-space: pre-wrap;
+    color: #222;
+}
 .button-group {
     display: flex;
     gap: 0;
@@ -225,4 +235,17 @@ table.darktable tr:nth-child(odd) {
 .button-group button:hover {
     background-color: #c76f8b;
     color: #4a1725;
+}
+
+#rephraseargs {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.large-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    font-size: 16px;
+    min-height: 44px;
 }

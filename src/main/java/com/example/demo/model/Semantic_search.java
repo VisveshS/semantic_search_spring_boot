@@ -19,7 +19,7 @@ public class Semantic_search {
     ArrayList<QueryResultSlice> queryoutput = new ArrayList<>();
     ArrayList<QueryResultSlice> privateNotesTags = new ArrayList<>();
     public ArrayList<String> newEntries = new ArrayList<String>();
-    public ArrayList<String> persist = new ArrayList<String>(); //url from bulk insertion
+    public ArrayList<String> persist = new ArrayList<String>(); //url from bulk insertion, embedding
 
     BufferedReader reader;
     PrintWriter writer;
@@ -77,7 +77,7 @@ public class Semantic_search {
                 String cansave = reader.readLine();
                 String num_embeddings = reader.readLine();
                 queryoutput.clear();
-                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count, pagerank, clustering, cansave, QueryResultSlice.fetchSourceSite(dburl), num_embeddings, persist.get(0)))));
+                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of(args, dburl, dbdesc,nodeid_in_knn_count, pagerank, clustering, cansave, QueryResultSlice.fetchSourceSite(dburl), num_embeddings, persist.get(0), persist.get(1)))));
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
                 for(int i=0;i<nline;i++) {
@@ -93,9 +93,9 @@ public class Semantic_search {
                 System.out.println(line);
                 for(int i=0;i<nline;i++) {
                     String label = reader.readLine();
-                    String score = reader.readLine();
+                    String embeddingdetails[] = reader.readLine().split(" ");
                     System.out.println(label);
-                    privateNotesTags.add(new QueryResultSlice(new ArrayList<>(List.of(label, score))));
+                    privateNotesTags.add(new QueryResultSlice(new ArrayList<>(List.of(embeddingdetails[0], label, embeddingdetails[1], "", ""))));
                 }
             }
             catch (IOException e) {
@@ -114,7 +114,7 @@ public class Semantic_search {
                 String num_embeddings = reader.readLine();
                 line = reader.readLine();
                 nline = Integer.parseInt(line);
-                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("", "", args,"","", cscore, cansave,"", num_embeddings, persist.get(0)))));
+                queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("", "", args,"","", cscore, cansave,"", num_embeddings, persist.get(0), ""))));
                 for(int i=0;i<nline;i++) {
                     dburl = reader.readLine();
                     dbdesc = reader.readLine();
@@ -128,8 +128,8 @@ public class Semantic_search {
                 privateNotesTags.clear();
                 for(int i=0;i<nline;i++) {
                     String label = reader.readLine();
-                    String score = reader.readLine();
-                    privateNotesTags.add(new QueryResultSlice(new ArrayList<>(List.of(label, score))));
+                    String embeddingdetails[] = reader.readLine().split(" ");
+                    privateNotesTags.add(new QueryResultSlice(new ArrayList<>(List.of(embeddingdetails[0], label, embeddingdetails[1], "", ""))));
                 }
             }
             catch (IOException e) {
@@ -150,7 +150,7 @@ public class Semantic_search {
             String cansave = reader.readLine();
             String insertfield[] = args.split(" ",2);
             String num_embeddings = String.valueOf(Integer.parseInt(queryoutput.get(0).fetchSlice().get(8))+1);
-            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,pagerank,cscore,cansave,QueryResultSlice.fetchSourceSite(insertfield[0]), num_embeddings, persist.get(0)))));
+            queryoutput.set(0,new QueryResultSlice(new ArrayList<>(List.of(new_index.toString(), insertfield[0], insertfield[1], nodeid_in_knn_count,pagerank,cscore,cansave,QueryResultSlice.fetchSourceSite(insertfield[0]), num_embeddings, persist.get(0), ""))));
             for(int i=1;i<queryoutput.size();i++) {
                 queryoutput.get(i).fetchSlice().set(5,String.valueOf(mutual_knn.charAt(i-1)));
             }
@@ -194,6 +194,7 @@ public class Semantic_search {
             writer.println("exit");
             new Thread(() -> {
                 queryoutput.clear();
+                privateNotesTags.clear();
                 try {
                     Thread.sleep(100); // small delay so response is flushed
                     System.exit(0);
@@ -227,7 +228,7 @@ public class Semantic_search {
             String num_embeddings = reader.readLine();
             line = reader.readLine();
             nline = Integer.parseInt(line);
-            queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("-1", "", args,"","", "0", cansave,"", num_embeddings, persist.get(0)))));
+            queryoutput.add(new QueryResultSlice(new ArrayList<>(List.of("-1", "", args,"","", "0", cansave,"", num_embeddings, persist.get(0),""))));
             for(int i=0;i<nline;i++) {
                 dburl = reader.readLine();
                 dbdesc = reader.readLine();
@@ -240,6 +241,7 @@ public class Semantic_search {
             writer.println("rephrase");
             writer.println(queryoutput.get(0).fetchSlice().get(0) + " " + args);
             line = reader.readLine();
+            persist.set(1, queryoutput.get(0).fetchSlice().get(10));
             query(0, line);
         }
         else if (action == 11) {
@@ -247,7 +249,32 @@ public class Semantic_search {
             writer.println(queryoutput.get(0).fetchSlice().get(0));
             writer.println(args);
             line = reader.readLine();
+            persist.set(1, queryoutput.get(0).fetchSlice().get(10));
             query(0, line);
+        }
+        else if (action == 12) {
+            writer.println("bulkstring");
+            List<String> argvals = new ArrayList<>(Arrays.asList(args.split(" ")));
+            if(argvals.get(0).equals("1"))
+                argvals.add(queryoutput.get(0).fetchSlice().get(0));
+            writer.println(argvals.get(0)+" "+argvals.get(1));
+            line = reader.readLine();
+            if(argvals.size()>2)
+                persist.set(2, argvals.get(2));
+            if(persist.get(2).isEmpty())
+                persist.set(2, new String(new char[privateNotesTags.size()]).replace('\0', '0'));
+            String restored = line.replace("\\n", "\n");
+            if(argvals.get(0).equals("1"))
+                queryoutput.get(0).fetchSlice().set(10, restored);
+            else if(argvals.get(0).equals("0")) {
+                for(int i=0;i<privateNotesTags.size();i++) {
+                    privateNotesTags.get(i).fetchSlice().set(4, String.valueOf(persist.get(2).charAt(i)));
+                    if(privateNotesTags.get(i).fetchSlice().get(0).equals(argvals.get(1))) {
+                        privateNotesTags.get(i).fetchSlice().set(3, restored);
+                        privateNotesTags.get(i).fetchSlice().set(4, "1");
+                    }
+                }
+            }
         }
         return queryoutput;
     }

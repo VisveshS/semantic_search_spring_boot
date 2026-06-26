@@ -3,6 +3,7 @@
     <head>
         <title>Form</title>
         <link rel="stylesheet" th:href="@{/css/style.css}">
+        <link rel="icon" type="image/png" th:href="@{/misc/psyshield.png}">
     </head>
     <body>
         <h1>Spring Boot, Python - Semantic Search</h1>
@@ -48,9 +49,9 @@
             </div>
         </div>
         <form th:action="@{/index}" method="post">
-            <input type="text" name="args" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[2]}"/>
+            <input class="large-input" type="text" name="args" th:value="${#lists.isEmpty(query_result) ? '' : query_result[0].values[2]}"/>
             <input type="hidden" name="useraction" value="1"/>
-            <button type="submit" onclick="this.form.submit(); this.disabled=true;" class = "btn btn-insert">Submit</button>
+            <button type="submit" onclick="window.sessionStorage.setItem('scrollY', window.scrollY); this.form.submit(); this.disabled=true;" class = "btn btn-insert">Submit</button>
         </form>
 
         <span id="newentryURL"
@@ -99,7 +100,7 @@
                         cluster size
                     </th>
                 </tr>
-                <tr th:if="${query_result[0].values[0] != '' && query_result[0].values[0] != '-1'}" onclick="toggleRow('rephrasedropdown')">
+                <tr th:if="${query_result[0].values[0] != '' && query_result[0].values[0] != '-1'}" id="rephrasedropdownRow">
                     <td>
                         <a class="custom-link" th:href="${query_result[0].values[1]}" th:text="${query_result[0].values[7]}"></a>
                     </td>
@@ -114,7 +115,7 @@
                     </td>
                 </tr>
                 <!-- Hidden expandable row -->
-                <tr id="rephrasedropdown" style="display:none;">
+                <tr id="rephrasedropdown" th:style="${query_result[0].values[10] == ''} ? 'display:none;' : ''">
                     <td colspan="2">
                         <form th:action="@{/index}" method="post">
                             <div class="rephrase-container">
@@ -124,17 +125,24 @@
                                 <div class="button-group">
                                     <button type="submit"
                                             onclick="submitrephrase('rephrasedropdown', '0')">
-                                        new url
+                                        url
                                     </button>
                                     <button type="submit"
                                             onclick="submitrephrase('rephrasedropdown', '1')">
-                                        visible text
+                                        phrase
                                     </button>
                                     <button type="submit"
                                             onclick="submitrephrase('rephrasedropdown', '2')">
-                                        true embedding
+                                        rephrase
+                                    </button>
+                                    <button type="submit"
+                                            onclick="submitrephrase('rephrasedropdown', '3')">
+                                        show embedding
                                     </button>
                                 </div>
+                                <p th:if="${query_result[0].values[10] != ''}"
+                                   th:text="${query_result[0].values[10]}">
+                                </p>
                             </div>
                         </form>
                     </td>
@@ -171,11 +179,24 @@
         <button id="privatenodes" onclick="scrollToId('publicnodes')" class="btn btn-seek">Top</button>
         <table class="darktable">
             <tbody>
-            <tr th:each="slice : ${privatenodetags}">
-                <td th:each="val : ${slice.values}"
-                    th:text="${val}">
-                </td>
-            </tr>
+                <th:block th:each="slice, stat : ${privatenodetags}">
+                    <tr
+                            th:data-hasdetails="${slice.values[3] != ''}"
+                            th:data-id="'privembed-' + ${stat.index}"
+                            onclick="rowClick(this)">
+                        <td>
+                            <form th:action="@{/index}" method="post">
+                                <input type="hidden" id="privatenodesclicked" name="args" th:value="'0 ' + ${slice.values[0]}"/>
+                                <input type="hidden" name="useraction" value="12"/>
+                                <span th:text="${slice.values[1]}"></span>
+                                <span th:text="${slice.values[2]}"></span>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:style="${slice.values[4] == '1'} ? '' : 'display:none;'" th:id="'privembed-' + ${stat.index}" class="highlight">
+                        <td colspan="2" th:text="${slice.values[3]}"></td>
+                    </tr>
+                </th:block>
             </tbody>
         </table>
         <div style="display:flex; width:100%; margin-top:10px;">
@@ -238,6 +259,7 @@
                 .then(res => alert("saved to db and closed connection"))
                 .catch(err => console.error(err));
             };
+            document.getElementById("rephrasedropdownRow")?.addEventListener("click", () => toggleRow("rephrasedropdown"));
             document.getElementById("NoSaveAndExit").onclick = () => {
               fetch("/index", { method: "POST" })
                 .then(res => alert("POST 2 sent"))
@@ -279,11 +301,12 @@
                 details.style.display = details.style.display === 'none' ? '' : 'none';
             }
             function submitrephrase(row, prefixFlag) {
+                window.sessionStorage.setItem("scrollY", window.scrollY);
                 const a = document.getElementById("rephraseargs").value;
                 document.getElementById("rephrasefield").value = prefixFlag;
                 const details = document.getElementById(row);
                 details.style.display = details.style.display === 'none' ? '' : 'none';
-                toggleRow('rephrasedropdown', prefixFlag);
+                toggleRow('rephrasedropdown');
                 console.log("is url/desc?", (prefixFlag=='0'||prefixFlag=='1'));
                 if(prefixFlag=='0'||prefixFlag=='1') {
                     document.getElementById("rephraseargs").value = prefixFlag + " " + a;
@@ -293,11 +316,45 @@
                     document.getElementById("rephraseargs").value = a;
                     document.getElementById("rephraseaction").value = 10;
                 }
+                else if(prefixFlag=='3') {
+                    document.getElementById("rephraseargs").value = 1
+                    document.getElementById("rephraseaction").value = 12;
+                    if(a!='')
+                        toggleRow('rephrasedropdown');
+                }
             }
             function scrollToId(id) {
                 document.getElementById(id)
                         .scrollIntoView({ behavior: "smooth" });
             }
+            function togglePrivEmbed(index) {
+                const row = document.getElementById(index);
+                if (!row) return;
+                row.style.display =
+                    row.style.display === "none" ? "" : "none";
+            }
+            function rowClick(row) {
+                window.sessionStorage.setItem("scrollY", window.scrollY);
+                const temp = row.querySelector("input[name='args']").value;
+                if (row.dataset.hasdetails === "true")
+                    togglePrivEmbed(row.dataset.id);
+                else {
+                    let states = "";
+                    document.querySelectorAll('tr[id^="privembed-"]').forEach(privrow => {
+                        states += (privrow.style.display === "none") ? "0" : "1";
+                    });
+                    row.querySelector("input[name='args']").value = temp + " " + states;
+                    console.log(row.querySelector("input[name='args']").value);
+                    row.querySelector("form").submit();
+                }
+            }
+            window.addEventListener("load", () => {
+                const y = sessionStorage.getItem("scrollY");
+                if (y !== null) {
+                    window.scrollTo(0, parseInt(y));
+                    sessionStorage.removeItem("scrollY");
+                }
+            });
         </script>
     </body>
 </html>
