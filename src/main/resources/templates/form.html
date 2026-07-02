@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Form</title>
+        <title>PsyShield</title>
         <link rel="stylesheet" th:href="@{/css/style.css}">
-        <link rel="icon" type="image/png" th:href="@{/misc/psyshield.png}">
+        <link rel="icon" type="image/png" th:href="@{/misc/psyshield_tab_icon.png}">
+        <style>
+            body {
+                background-image: url('/misc/psyshield_graph.png');
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: cover;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
     </head>
     <body>
         <h1>Spring Boot, Python - Semantic Search</h1>
@@ -100,17 +110,17 @@
                         cluster size
                     </th>
                 </tr>
-                <tr th:if="${query_result[0].values[0] != '' && query_result[0].values[0] != '-1'}" id="rephrasedropdownRow">
+                <tr th:if="${query_result[0].values[0] != '' && query_result[0].values[0] != '-1'}">
                     <td>
                         <a class="custom-link" th:href="${query_result[0].values[1]}" th:text="${query_result[0].values[7]}"></a>
                     </td>
-                    <td>
+                    <td class="rephrasedropdownRow">
                         <p>[[${query_result[0].values[2]}]]</p>
                     </td>
-                    <td>
+                    <td class="rephrasedropdownRow">
                         <p>[[${query_result[0].values[3]}]]</p>
                     </td>
-                    <td>
+                    <td class="rephrasedropdownRow">
                         <p>[[${query_result[0].values[4]}]]</p>
                     </td>
                 </tr>
@@ -163,14 +173,15 @@
                                 <span th:text="${query_row.values[2]}"></span>
                             </form>
                         </td>
-                        <td>
+                        <td th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'">
                             <p th:text="${query_row.values[3]}"></p>
                         </td>
-                        <td>
+                        <td th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'">
                             <p th:text="${query_row.values[4]}"></p>
                         </td>
                         <td th:if="${query_result[0].values[0] == '-1'}"
-                            th:text="${query_row.values[7]}">
+                            th:text="${query_row.values[7]}"
+                            th:class="${query_row.values[5] == '1'} ? 'same_cluster' : 'different_cluster'">
                         </td>
                     </tr>
                 </tbody>
@@ -259,7 +270,10 @@
                 .then(res => alert("saved to db and closed connection"))
                 .catch(err => console.error(err));
             };
-            document.getElementById("rephrasedropdownRow")?.addEventListener("click", () => toggleRow("rephrasedropdown"));
+            document.querySelectorAll(".rephrasedropdownRow").forEach(td => {
+<!--                console.log("called");-->
+                td.addEventListener("click", () => toggleRow("rephrasedropdown"));
+            });
             document.getElementById("NoSaveAndExit").onclick = () => {
               fetch("/index", { method: "POST" })
                 .then(res => alert("POST 2 sent"))

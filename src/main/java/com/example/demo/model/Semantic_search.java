@@ -182,8 +182,10 @@ public class Semantic_search {
             writer.println("save");
             writer.println("exit");
             new Thread(() -> {
+                queryoutput.clear();
+                privateNotesTags.clear();
                 try {
-                    Thread.sleep(200); // small delay so response is flushed
+                    Thread.sleep(500); // small delay so response is flushed
                     System.exit(0);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -196,7 +198,7 @@ public class Semantic_search {
                 queryoutput.clear();
                 privateNotesTags.clear();
                 try {
-                    Thread.sleep(100); // small delay so response is flushed
+                    Thread.sleep(500); // small delay so response is flushed
                     System.exit(0);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();

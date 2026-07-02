@@ -13,8 +13,8 @@
     border-radius: 2px;
 }
 
-.same_cluster { background-color: rgb(200,200,250); }
-.different_cluster { background-color: rgb(200,200,100); }
+.same_cluster { background-color: rgb(200,200,250,0.66); }
+.different_cluster { background-color: rgb(200,200,100,0.66); }
 
 /* Button style */
 .submit-button {
